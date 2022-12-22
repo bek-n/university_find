@@ -3,34 +3,39 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:weather_app/Home/add_country.dart';
+import 'package:weather_app/model/uni_model.dart';
+import 'package:weather_app/repository/get_info.dart';
 
 class HomePage extends StatefulWidget {
   final String country;
-  const HomePage({super.key,  this.country='Uzbekistan'});
+  const HomePage({super.key, this.country = 'Uzbekistan'});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  dynamic data;
+  GetInformationRepository api = GetInformationRepository();
+  List<University> listOfUniversity = [];
   bool isLoading = true;
 
-  Future<void> getInfo() async {
+  Future<void> getInformation() async {
     isLoading = true;
     setState(() {});
-    final url =
-        Uri.parse('http://universities.hipolabs.com/search?country=India');
-    final res = await http.get(url);
-    data = jsonDecode(res.body);
+    dynamic data = await api.getInformation(name: widget.country);
+
+    data.forEach((element) {
+      listOfUniversity.add(University.fromJson(element));
+    });
     isLoading = false;
     setState(() {});
   }
 
   @override
   void initState() {
-    getInfo();
+    getInformation();
     super.initState();
   }
 
@@ -52,14 +57,14 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         appBar: AppBar(
-          title: Text('Universities Info'),
+          title: Text('Universities of ${widget.country}'),
         ),
         body: isLoading
             ? Center(
                 child: CircularProgressIndicator(),
               )
             : ListView.builder(
-                itemCount: data.length,
+                itemCount: listOfUniversity.length,
                 itemBuilder: ((context, index) => Container(
                       margin: EdgeInsets.only(top: 16),
                       padding:
@@ -70,7 +75,7 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         children: [
                           Text(
-                            data[index]['name'],
+                            listOfUniversity[index].name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -78,13 +83,17 @@ class _HomePageState extends State<HomePage> {
                             height: 30,
                           ),
                           TextButton(
-                              onPressed: (() async {
+                              onPressed: () async {
                                 final launchUri = Uri.parse(
-                                    data[index]['web_pages']?[0] ?? '');
-                                await url_launcher.launchUrl(launchUri);
-                              }),
+                                  listOfUniversity[index].webPages?.first ?? "",
+                                );
+                                await url_launcher.launchUrl(
+                                  launchUri,
+                                  mode: LaunchMode.externalApplication,
+                                );
+                              },
                               child: Text(
-                                data[index]['web_pages']?[0] ?? '',
+                                listOfUniversity[index].webPages?.first ?? "",
                                 style: TextStyle(color: Colors.white),
                               )),
                           SizedBox(
