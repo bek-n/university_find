@@ -13,13 +13,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Weather',
-      theme: ThemeData(
-        
-       
-      ),
+      title: 'University Finding',
+      theme: ThemeData(),
       home: const HomePage(),
     );
   }
 }
-

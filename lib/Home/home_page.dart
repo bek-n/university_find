@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
+import 'package:weather_app/Home/add_country.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String country;
+  const HomePage({super.key,  this.country='Uzbekistan'});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -35,6 +37,20 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: ((context) => AddingCountry())));
+          },
+          child: Container(
+            height: 100,
+            width: 100,
+            decoration: BoxDecoration(
+                color: Colors.teal,
+                borderRadius: BorderRadius.all(Radius.circular(30))),
+            child: Icon(Icons.search_outlined),
+          ),
+        ),
         appBar: AppBar(
           title: Text('Universities Info'),
         ),
